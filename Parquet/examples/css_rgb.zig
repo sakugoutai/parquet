@@ -1,61 +1,30 @@
 const std = @import("std");
 const heap = std.heap;
 const io = std.io;
+const mem = std.mem;
+const Allocator = mem.Allocator;
 
 const Parquet = @import("Parquet.zig");
 const String = Parquet.Base.String;
 const Analyte = Parquet.ParserCombinator.Analyte;
 const Parser = Parquet.ParserCombinator.Parser;
+const Retriever = Parquet.ParserCombinator.Retriever;
 const Combinators = Parquet.ParserCombinator.Combinators;
-const Collector = Parquet.ParserCombinator.Collector;
 const Parsers = Parquet.ParserCombinator.Parsers;
 const Invoker = Parquet.ParserCombinator.Invoker;
 
 
 pub fn main() anyerror!void {
-    //var gpa = heap.GeneralPurposeAllocator(.{}){};
-    //defer _ = gpa.deinit();
     var arena = heap.ArenaAllocator.init(heap.page_allocator);
     defer arena.deinit();
 
-    const text_1: String = try String.init(arena.allocator(), "#aabbcc");
-    defer text_1.deinit();
-    Collector.init(arena.allocator());
-    try Invoker.parseTest(rgb, arena.allocator(), text_1);
-    for (Collector.get()) |token| {
-        try io.getStdOut().writer().print("{s}\n", .{ token.getPrimitive() });
-    }
-    Collector.deinit();
-
-    const text_2: String = try String.init(arena.allocator(), "#abc");
-    defer text_2.deinit();
-    Collector.init(arena.allocator());
-    try Invoker.parseTest(rgb, arena.allocator(), text_2);
-    for (Collector.get()) |token| {
-        try io.getStdOut().writer().print("{s}\n", .{ token.getPrimitive() });
-    }
-    Collector.deinit();
-
-    const text_3: String = try String.init(arena.allocator(), "#000000");
-    defer text_3.deinit();
-    Collector.init(arena.allocator());
-    try Invoker.parseTest(rgb, arena.allocator(), text_3);
-    for (Collector.get()) |token| {
-        try io.getStdOut().writer().print("{s}\n", .{ token.getPrimitive() });
-    }
-    Collector.deinit();
-
-    const text_4: String = try String.init(arena.allocator(), "#000");
-    defer text_4.deinit();
-    Collector.init(arena.allocator());
-    try Invoker.parseTest(rgb, arena.allocator(), text_4);
-    for (Collector.get()) |token| {
-        try io.getStdOut().writer().print("{s}\n", .{ token.getPrimitive() });
-    }
-    Collector.deinit();
+    try Invoker.parseTest(css_rgb_parser, arena.allocator(), try String.init(arena.allocator(), "#aabbcc"));
+    try Invoker.parseTest(css_rgb_parser, arena.allocator(), try String.init(arena.allocator(), "#abc"));
+    try Invoker.parseTest(css_rgb_parser, arena.allocator(), try String.init(arena.allocator(), "#000000"));
+    try Invoker.parseTest(css_rgb_parser, arena.allocator(), try String.init(arena.allocator(), "#000"));
 }
 
-fn rgb() type {
+fn css_rgb_parser() type {
     return Combinators.choice2(
         css_rrggbb, css_rgb
     );
@@ -63,13 +32,13 @@ fn rgb() type {
 
 fn css_rrggbb() type {
     return Combinators.sequence4(
-        Parsers.match("#"), Collector.this(rr), Collector.this(gg), Collector.this(bb)
+        Parsers.match("#"), rr, gg, bb
     );
 }
 
 fn css_rgb() type {
-    return Combinators.sequence5(
-        Parsers.match("#"), Collector.backtrack(3), Collector.this(r), Collector.this(g), Collector.this(b)
+    return Combinators.sequence4(
+        Parsers.match("#"), r, g, b
     );
 }
 

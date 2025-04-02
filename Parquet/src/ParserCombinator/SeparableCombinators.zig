@@ -5,7 +5,6 @@ const Base = @import("../Base.zig");
 const String = Base.String;
 const Analyte = @import("Analyte.zig").Analyte;
 const ParsingFunction = @import("Parser.zig").ParsingFunction;
-const Parser = @import("Parser.zig").Parser;
 const Retriever = @import("Parser.zig").Retriever;
 pub const Combinators = @import("Combinators.zig");
 pub const Parsers = @import("Parsers.zig");
@@ -205,7 +204,7 @@ pub fn sequence11(parser1: anytype, parser2: anytype, parser3: anytype, parser4:
 
 /// p1 / p2
 pub fn choice2(parser1: anytype, parser2: anytype) type {
-    return Combinators.choise2(
+    return Combinators.choice2(
         Combinators.sequence3(Parsers.separators0, parser1, Parsers.separators0),
         Combinators.sequence3(Parsers.separators0, parser2, Parsers.separators0)
     );
@@ -213,7 +212,7 @@ pub fn choice2(parser1: anytype, parser2: anytype) type {
 
 /// p1 / p2 / p3
 pub fn choice3(parser1: anytype, parser2: anytype, parser3: anytype) type {
-    return Combinators.choise3(
+    return Combinators.choice3(
         Combinators.sequence3(Parsers.separators0, parser1, Parsers.separators0),
         Combinators.sequence3(Parsers.separators0, parser2, Parsers.separators0),
         Combinators.sequence3(Parsers.separators0, parser3, Parsers.separators0)
@@ -222,7 +221,7 @@ pub fn choice3(parser1: anytype, parser2: anytype, parser3: anytype) type {
 
 /// p1 / p2 / p3 / p4
 pub fn choice4(parser1: anytype, parser2: anytype, parser3: anytype, parser4: anytype) type {
-    return Combinators.choise4(
+    return Combinators.choice4(
         Combinators.sequence3(Parsers.separators0, parser1, Parsers.separators0),
         Combinators.sequence3(Parsers.separators0, parser2, Parsers.separators0),
         Combinators.sequence3(Parsers.separators0, parser3, Parsers.separators0),
@@ -232,7 +231,7 @@ pub fn choice4(parser1: anytype, parser2: anytype, parser3: anytype, parser4: an
 
 /// p1 / p2 / p3 / p4 / p5
 pub fn choice5(parser1: anytype, parser2: anytype, parser3: anytype, parser4: anytype, parser5: anytype) type {
-    return Combinators.choise5(
+    return Combinators.choice5(
         Combinators.sequence3(Parsers.separators0, parser1, Parsers.separators0),
         Combinators.sequence3(Parsers.separators0, parser2, Parsers.separators0),
         Combinators.sequence3(Parsers.separators0, parser3, Parsers.separators0),
@@ -243,7 +242,7 @@ pub fn choice5(parser1: anytype, parser2: anytype, parser3: anytype, parser4: an
 
 /// p1 / p2 / p3 / p4 / p5 / p6
 pub fn choice6(parser1: anytype, parser2: anytype, parser3: anytype, parser4: anytype, parser5: anytype, parser6: anytype) type {
-    return Combinators.choise6(
+    return Combinators.choice6(
         Combinators.sequence3(Parsers.separators0, parser1, Parsers.separators0),
         Combinators.sequence3(Parsers.separators0, parser2, Parsers.separators0),
         Combinators.sequence3(Parsers.separators0, parser3, Parsers.separators0),
@@ -255,7 +254,7 @@ pub fn choice6(parser1: anytype, parser2: anytype, parser3: anytype, parser4: an
 
 /// p1 / p2 / p3 / p4 / p5 / p6 / p7
 pub fn choice7(parser1: anytype, parser2: anytype, parser3: anytype, parser4: anytype, parser5: anytype, parser6: anytype, parser7: anytype) type {
-    return Combinators.choise7(
+    return Combinators.choice7(
         Combinators.sequence3(Parsers.separators0, parser1, Parsers.separators0),
         Combinators.sequence3(Parsers.separators0, parser2, Parsers.separators0),
         Combinators.sequence3(Parsers.separators0, parser3, Parsers.separators0),
@@ -268,7 +267,7 @@ pub fn choice7(parser1: anytype, parser2: anytype, parser3: anytype, parser4: an
 
 /// p1 / p2 / p3 / p4 / p5 / p6 / p7 / p8
 pub fn choice8(parser1: anytype, parser2: anytype, parser3: anytype, parser4: anytype, parser5: anytype, parser6: anytype, parser7: anytype, parser8: anytype) type {
-    return Combinators.choise8(
+    return Combinators.choice8(
         Combinators.sequence3(Parsers.separators0, parser1, Parsers.separators0),
         Combinators.sequence3(Parsers.separators0, parser2, Parsers.separators0),
         Combinators.sequence3(Parsers.separators0, parser3, Parsers.separators0),
@@ -282,7 +281,7 @@ pub fn choice8(parser1: anytype, parser2: anytype, parser3: anytype, parser4: an
 
 /// p1 / p2 / p3 / p4 / p5 / p6 / p7 / p8 / p9
 pub fn choice9(parser1: anytype, parser2: anytype, parser3: anytype, parser4: anytype, parser5: anytype, parser6: anytype, parser7: anytype, parser8: anytype, parser9: anytype) type {
-    return Combinators.choise9(
+    return Combinators.choice9(
         Combinators.sequence3(Parsers.separators0, parser1, Parsers.separators0),
         Combinators.sequence3(Parsers.separators0, parser2, Parsers.separators0),
         Combinators.sequence3(Parsers.separators0, parser3, Parsers.separators0),
@@ -297,7 +296,7 @@ pub fn choice9(parser1: anytype, parser2: anytype, parser3: anytype, parser4: an
 
 /// p1 / p2 / p3 / p4 / p5 / p6 / p7 / p8 / p9 / p10
 pub fn choice10(parser1: anytype, parser2: anytype, parser3: anytype, parser4: anytype, parser5: anytype, parser6: anytype, parser7: anytype, parser8: anytype, parser9: anytype, parser10: anytype) type {
-    return Combinators.choise10(
+    return Combinators.choice10(
         Combinators.sequence3(Parsers.separators0, parser1, Parsers.separators0),
         Combinators.sequence3(Parsers.separators0, parser2, Parsers.separators0),
         Combinators.sequence3(Parsers.separators0, parser3, Parsers.separators0),
@@ -313,7 +312,7 @@ pub fn choice10(parser1: anytype, parser2: anytype, parser3: anytype, parser4: a
 
 /// p1 / p2 / p3 / p4 / p5 / p6 / p7 / p8 / p9 / p10 / p11
 pub fn choice11(parser1: anytype, parser2: anytype, parser3: anytype, parser4: anytype, parser5: anytype, parser6: anytype, parser7: anytype, parser8: anytype, parser9: anytype, parser10: anytype, parser11: anytype) type {
-    return Combinators.choise11(
+    return Combinators.choice11(
         Combinators.sequence3(Parsers.separators0, parser1, Parsers.separators0),
         Combinators.sequence3(Parsers.separators0, parser2, Parsers.separators0),
         Combinators.sequence3(Parsers.separators0, parser3, Parsers.separators0),

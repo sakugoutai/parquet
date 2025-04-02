@@ -6,109 +6,99 @@ const Base = @import("../Base.zig");
 const String = Base.String;
 const Analyte = @import("Analyte.zig").Analyte;
 const Combinators = @import("Combinators.zig");
+const Parser = @import("Parser.zig").Parser;
+const Retriever = @import("Parser.zig").Retriever;
 
 
 pub fn through() type {
-    return struct {
-        pub const body = struct {
-            fn anonymous(allocator: Allocator, text: String) anyerror!Analyte {
-                return Analyte.initWithOk(allocator, text);
-            }
-        }.anonymous;
-    };
+    return Parser(struct {
+        fn anonymous(allocator: Allocator, text: String) anyerror!Analyte {
+            return Analyte.initWithOk(allocator, text);
+        }
+    }.anonymous);
 }
 
 pub fn fail() type {
-    return struct {
-        pub const body = struct {
-            fn anonymous(allocator: Allocator, text: String) anyerror!Analyte {
-                return Analyte.initWithErr(allocator, text);
-            }
-        }.anonymous;
-    };
+    return Parser(struct {
+        fn anonymous(allocator: Allocator, text: String) anyerror!Analyte {
+            return Analyte.initWithErr(allocator, text);
+        }
+    }.anonymous);
 }
 
 pub fn match(pattern: []const u8) type {
-    return struct {
-        pub const body = struct {
-            fn anonymous(allocator: Allocator, text: String) anyerror!Analyte {
-                const pattern_string: String = try String.init(allocator, pattern);
-                defer pattern_string.deinit();
+    return Parser(struct {
+        fn anonymous(allocator: Allocator, text: String) anyerror!Analyte {
+            const pattern_string: String = try String.init(allocator, pattern);
+            defer pattern_string.deinit();
 
-                if (text.isEmpty())
-                    return try Analyte.initWithErr(allocator, text);
+            if (text.isEmpty())
+                return try Analyte.initWithErr(allocator, text);
 
-                if (!text.startsWith(pattern_string))
-                    return try Analyte.initWithErr(allocator, text);
+            if (!text.startsWith(pattern_string))
+                return try Analyte.initWithErr(allocator, text);
 
-                return try Analyte.initWithConsumed(pattern_string, allocator, text);
-            }
-        }.anonymous;
-    };
+            return try Analyte.initWithConsumed(pattern_string, allocator, text);
+        }
+    }.anonymous);
 }
 
 pub fn unMatch(pattern: []const u8) type {
-    return struct {
-        pub const body = struct {
-            fn anonymous(allocator: Allocator, text: String) anyerror!Analyte {
-                const pattern_string: String = try String.init(allocator, pattern);
-                defer pattern_string.deinit();
+    return Parser(struct {
+        fn anonymous(allocator: Allocator, text: String) anyerror!Analyte {
+            const pattern_string: String = try String.init(allocator, pattern);
+            defer pattern_string.deinit();
 
-                if (text.isEmpty())
-                    return try Analyte.initWithErr(allocator, text);
+            if (text.isEmpty())
+                return try Analyte.initWithErr(allocator, text);
 
-                if (text.startsWith(pattern_string))
-                    return try Analyte.initWithErr(allocator, text);
+            if (text.startsWith(pattern_string))
+                return try Analyte.initWithErr(allocator, text);
 
-                return try Analyte.initWithConsumed(try text.substring(allocator, 0, 1), allocator, text);
-            }
-        }.anonymous;
-    };
+            return try Analyte.initWithConsumed(try text.substring(allocator, 0, 1), allocator, text);
+        }
+    }.anonymous);
 }
 
 pub fn oneOf(patterns: []const []const u8) type {
-    return struct {
-        pub const body = struct {
-            fn anonymous(allocator: Allocator, text: String) anyerror!Analyte {
-                for (patterns) |pattern| {
-                    if (pattern.len > text.getLength())
-                        continue;
+    return Parser(struct {
+        fn anonymous(allocator: Allocator, text: String) anyerror!Analyte {
+            for (patterns) |pattern| {
+                if (pattern.len > text.getLength())
+                    continue;
 
-                    const pattern_string: String = try String.init(allocator, pattern);
-                    defer pattern_string.deinit();
+                const pattern_string: String = try String.init(allocator, pattern);
+                defer pattern_string.deinit();
 
-                    if (text.startsWith(pattern_string)) {
-                        return try Analyte.initWithConsumed(pattern_string, allocator, text);
-                    }
+                if (text.startsWith(pattern_string)) {
+                    return try Analyte.initWithConsumed(pattern_string, allocator, text);
                 }
-
-                return try Analyte.initWithErr(allocator, text);
             }
-        }.anonymous;
-    };
+
+            return try Analyte.initWithErr(allocator, text);
+        }
+    }.anonymous);
 }
 
 pub fn noneOf(patterns: []const []const u8) type {
-    return struct {
-        pub const body = struct {
-            fn anonymous(allocator: Allocator, text: String) anyerror!Analyte {
-                for (patterns) |pattern| {
-                    if (pattern.len > text.getLength())
-                        continue;
+    return Parser(struct {
+        fn anonymous(allocator: Allocator, text: String) anyerror!Analyte {
+            for (patterns) |pattern| {
+                if (pattern.len > text.getLength())
+                    continue;
 
-                    const pattern_string: String = try String.init(allocator, pattern);
-                    defer pattern_string.deinit();
+                const pattern_string: String = try String.init(allocator, pattern);
+                defer pattern_string.deinit();
 
-                    if (text.startsWith(pattern_string))
-                        return try Analyte.initWithErr(allocator, text);
-                }
-
-                const tmp: String = try text.substring(allocator, 0, 1);
-                defer tmp.deinit();
-                return try Analyte.initWithConsumed(tmp, allocator, text);
+                if (text.startsWith(pattern_string))
+                    return try Analyte.initWithErr(allocator, text);
             }
-        }.anonymous;
-    };
+
+            const tmp: String = try text.substring(allocator, 0, 1);
+            defer tmp.deinit();
+            return try Analyte.initWithConsumed(tmp, allocator, text);
+        }
+    }.anonymous);
 }
 
 
@@ -117,19 +107,17 @@ fn isUpperCase(c: u8) bool {
 }
 
 pub fn upper() type {
-    return struct {
-        pub const body = struct {
-            fn anonymous(allocator: Allocator, text: String) anyerror!Analyte {
-                if (text.isEmpty())
-                    return try Analyte.initWithErr(allocator, text);
+    return Parser(struct {
+        fn anonymous(allocator: Allocator, text: String) anyerror!Analyte {
+            if (text.isEmpty())
+                return try Analyte.initWithErr(allocator, text);
 
-                if (!isUpperCase(try text.getHeadChar()))
-                    return try Analyte.initWithErr(allocator, text);
+            if (!isUpperCase(try text.getHeadChar()))
+                return try Analyte.initWithErr(allocator, text);
 
-                return try Analyte.initWithConsumedChar(allocator, text);
-            }
-        }.anonymous;
-    };
+            return try Analyte.initWithConsumedChar(allocator, text);
+        }
+    }.anonymous);
 }
 
 fn isLowerCase(c: u8) bool {
@@ -137,19 +125,17 @@ fn isLowerCase(c: u8) bool {
 }
 
 pub fn lower() type {
-    return struct {
-        pub const body = struct {
-            pub fn anonymous(allocator: Allocator, text: String) anyerror!Analyte {
-                if (text.isEmpty())
-                    return try Analyte.initWithErr(allocator, text);
+    return Parser(struct {
+        pub fn anonymous(allocator: Allocator, text: String) anyerror!Analyte {
+            if (text.isEmpty())
+                return try Analyte.initWithErr(allocator, text);
 
-                if (!isLowerCase(try text.getHeadChar()))
-                    return try Analyte.initWithErr(allocator, text);
+            if (!isLowerCase(try text.getHeadChar()))
+                return try Analyte.initWithErr(allocator, text);
 
-                return try Analyte.initWithConsumedChar(allocator, text);
-            }
-        }.anonymous;
-    };
+            return try Analyte.initWithConsumedChar(allocator, text);
+        }
+    }.anonymous);
 }
 
 fn isAlphabet(c: u8) bool {
@@ -157,19 +143,14 @@ fn isAlphabet(c: u8) bool {
 }
 
 pub fn letter() type {
-    return struct {
-        pub const body = struct {
-            pub fn anonymous(allocator: Allocator, text: String) anyerror!Analyte {
-                if (text.isEmpty())
-                    return try Analyte.initWithErr(allocator, text);
+    return Parser(struct {
+        pub fn anonymous(allocator: Allocator, text: String) anyerror!Analyte {
+            if (!isAlphabet(try text.getHeadChar()))
+                return try Analyte.initWithErr(allocator, text);
 
-                if (!isAlphabet(try text.getHeadChar()))
-                    return try Analyte.initWithErr(allocator, text);
-
-                return try Analyte.initWithConsumedChar(allocator, text);
-            }
-        }.anonymous;
-    };
+            return try Analyte.initWithConsumedChar(allocator, text);
+        }
+    }.anonymous);
 }
 
 fn isDigit(c: u8) bool {
@@ -177,19 +158,17 @@ fn isDigit(c: u8) bool {
 }
 
 pub fn digit() type {
-    return struct {
-        pub const body = struct {
-            pub fn anonymous(allocator: Allocator, text: String) anyerror!Analyte {
-                if (text.isEmpty())
-                    return try Analyte.initWithErr(allocator, text);
+    return Parser(struct {
+        pub fn anonymous(allocator: Allocator, text: String) anyerror!Analyte {
+            if (text.isEmpty())
+                return try Analyte.initWithErr(allocator, text);
 
-                if (!isDigit(try text.getHeadChar()))
-                    return try Analyte.initWithErr(allocator, text);
+            if (!isDigit(try text.getHeadChar()))
+                return try Analyte.initWithErr(allocator, text);
 
-                return try Analyte.initWithConsumedChar(allocator, text);
-            }
-        }.anonymous;
-    };
+            return try Analyte.initWithConsumedChar(allocator, text);
+        }
+    }.anonymous);
 }
 
 fn isAlphabetOrNumber(c: u8) bool {
@@ -197,19 +176,17 @@ fn isAlphabetOrNumber(c: u8) bool {
 }
 
 pub fn alphabetOrNumber() type {
-    return struct {
-        pub const body = struct {
-            pub fn anonymous(allocator: Allocator, text: String) anyerror!Analyte {
-                if (text.isEmpty())
-                    return try Analyte.initWithErr(allocator, text);
+    return Parser(struct {
+        pub fn anonymous(allocator: Allocator, text: String) anyerror!Analyte {
+            if (text.isEmpty())
+                return try Analyte.initWithErr(allocator, text);
 
-                if (!isAlphabetOrNumber(try text.getHeadChar()))
-                    return try Analyte.initWithErr(allocator, text);
+            if (!isAlphabetOrNumber(try text.getHeadChar()))
+                return try Analyte.initWithErr(allocator, text);
 
-                return try Analyte.initWithConsumedChar(allocator, text);
-            }
-        }.anonymous;
-    };
+            return try Analyte.initWithConsumedChar(allocator, text);
+        }
+    }.anonymous);
 }
 
 fn alphabetOrNumbers() type {
@@ -221,19 +198,17 @@ fn isHexadecimalDigit(c: u8) bool {
 }
 
 pub fn hexadecimalDigit() type {
-    return struct {
-        pub const body = struct {
-            pub fn anonymous(allocator: Allocator, text: String) anyerror!Analyte {
-                if (text.isEmpty())
-                    return try Analyte.initWithErr(allocator, text);
+    return Parser(struct {
+        pub fn anonymous(allocator: Allocator, text: String) anyerror!Analyte {
+            if (text.isEmpty())
+                return try Analyte.initWithErr(allocator, text);
 
-                if (!isHexadecimalDigit(try text.getHeadChar()))
-                    return try Analyte.initWithErr(allocator, text);
+            if (!isHexadecimalDigit(try text.getHeadChar()))
+                return try Analyte.initWithErr(allocator, text);
 
-                return try Analyte.initWithConsumedChar(allocator, text);
-            }
-        }.anonymous;
-    };
+            return try Analyte.initWithConsumedChar(allocator, text);
+        }
+    }.anonymous);
 }
 
 fn isOctalDigit(c: u8) bool {
@@ -241,48 +216,42 @@ fn isOctalDigit(c: u8) bool {
 }
 
 pub fn octalDigit() type {
-    return struct {
-        pub const body = struct {
-            pub fn anonymous(allocator: Allocator, text: String) anyerror!Analyte {
-                if (text.isEmpty())
-                    return try Analyte.initWithErr(allocator, text);
+    return Parser(struct {
+        pub fn anonymous(allocator: Allocator, text: String) anyerror!Analyte {
+            if (text.isEmpty())
+                return try Analyte.initWithErr(allocator, text);
 
-                if (!isOctalDigit(try text.getHeadChar()))
-                    return try Analyte.initWithErr(allocator, text);
+            if (!isOctalDigit(try text.getHeadChar()))
+                return try Analyte.initWithErr(allocator, text);
 
-                return try Analyte.initWithConsumedChar(allocator, text);
-            }
-        }.anonymous;
-    };
+            return try Analyte.initWithConsumedChar(allocator, text);
+        }
+    }.anonymous);
 }
 
 pub fn any() type {
-    return struct {
-        pub const body = struct {
-            pub fn anonymous(allocator: Allocator, text: String) anyerror!Analyte {
-                if (text.isEmpty())
-                    return try Analyte.initWithErr(allocator, text);
+    return Parser(struct {
+        pub fn anonymous(allocator: Allocator, text: String) anyerror!Analyte {
+            if (text.isEmpty())
+                return try Analyte.initWithErr(allocator, text);
 
-                return try Analyte.initWithConsumedChar(allocator, text);
-            }
-        }.anonymous;
-    };
+            return try Analyte.initWithConsumedChar(allocator, text);
+        }
+    }.anonymous);
 }
 
 pub fn satisfy(judger: fn (String) bool) type {
-    return struct {
-        pub const body = struct {
-            pub fn anonymous(allocator: Allocator, text: String) anyerror!Analyte {
-                if (text.isEmpty())
-                    return try Analyte.initWithErr(allocator, text);
+    return Parser(struct {
+        pub fn anonymous(allocator: Allocator, text: String) anyerror!Analyte {
+            if (text.isEmpty())
+                return try Analyte.initWithErr(allocator, text);
 
-                if (!judger(text))
-                    return try Analyte.initWithErr(allocator, text);
+            if (!judger(text))
+                return try Analyte.initWithErr(allocator, text);
 
-                return try Analyte.initWithConsumedChar(allocator, text);
-            }
-        }.anonymous;
-    };
+            return try Analyte.initWithConsumedChar(allocator, text);
+        }
+    }.anonymous);
 }
 
 pub fn space() type {
