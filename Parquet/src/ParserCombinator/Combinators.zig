@@ -13,8 +13,8 @@ const Retriever = @import("Parser.zig").Retriever;
 pub fn sequence(parsers: anytype) type {
     return Parser(struct {
         fn anonymous(allocator: Allocator, text: String) anyerror!Analyte {
-            const parsingFunctions: [@typeInfo(@TypeOf(parsers)).Struct.fields.len]ParsingFunction = blk: {
-                var fnPtrs: [@typeInfo(@TypeOf(parsers)).Struct.fields.len]ParsingFunction = undefined;
+            const parsingFunctions: [@typeInfo(@TypeOf(parsers)).@"struct".fields.len]ParsingFunction = blk: {
+                var fnPtrs: [@typeInfo(@TypeOf(parsers)).@"struct".fields.len]ParsingFunction = undefined;
                 inline for (parsers, 0..) |parser, i| {
                     fnPtrs[i] = Retriever.get(parser);
                 }
@@ -46,8 +46,8 @@ pub fn sequence(parsers: anytype) type {
 pub fn choice(parsers: anytype) type {
     return Parser(struct {
         fn anonymous(allocator: Allocator, text: String) anyerror!Analyte {
-            const parsingFunctions: [@typeInfo(@TypeOf(parsers)).Struct.fields.len]ParsingFunction = blk: {
-                var fnPtrs: [@typeInfo(@TypeOf(parsers)).Struct.fields.len]ParsingFunction = undefined;
+            const parsingFunctions: [@typeInfo(@TypeOf(parsers)).@"struct".fields.len]ParsingFunction = blk: {
+                var fnPtrs: [@typeInfo(@TypeOf(parsers)).@"struct".fields.len]ParsingFunction = undefined;
                 inline for (parsers, 0..) |parser, i| {
                     fnPtrs[i] = Retriever.get(parser);
                 }

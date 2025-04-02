@@ -21,7 +21,7 @@ pub const SemanticAction = *const fn (consumed: String) anyerror!void;
 ///     `body: ParsingFunction`.
 pub fn Parser(function: anytype) type {
 	switch (@typeInfo(@TypeOf(function))) {
-		.Fn => return struct {
+		.@"fn" => return struct {
 			pub const body = function;
 
 			pub fn attach(action: SemanticAction) type {
@@ -51,10 +51,10 @@ pub const ParserGenerator = *const fn () type;
 /// returning ParsingFunction
 pub const Retriever = struct {
 	pub fn get(parser: anytype) ParsingFunction {
-		return if (@typeInfo(@TypeOf(parser)) == .Fn and @typeInfo(@TypeOf(parser)).Fn.params.len != 0)
+		return if (@typeInfo(@TypeOf(parser)) == .@"fn" and @typeInfo(@TypeOf(parser)).@"fn".params.len != 0)
 			// ParsingFunction
 			parser
-		else if (@typeInfo(@TypeOf(parser)) == .Fn)
+		else if (@typeInfo(@TypeOf(parser)) == .@"fn")
 			// ParserGenerator
 			// fn () type { return struct { body: ParsingFunction }; }
 			parser().body

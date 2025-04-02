@@ -1,6 +1,10 @@
 .{
-    .name = "Parquet",
+    .name = .Parquet,
     .version = "0.0.1",
+    .fingerprint = 0x30581e1ccbd935ee,
+    .minimum_zig_version = "0.15.0-dev.171+1b62a2226",
+
+
     .dependencies = .{
     },
 
