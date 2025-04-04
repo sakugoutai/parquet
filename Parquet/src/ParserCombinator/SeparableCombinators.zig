@@ -12,11 +12,11 @@ pub const Parsers = @import("Parsers.zig");
 
 /// p1 >> ... >> pn
 pub fn sequence(parsers: anytype) type {
-    if (@typeInfo(@TypeOf(parsers)) != .Struct)
+    if (@typeInfo(@TypeOf(parsers)) != .@"struct")
 		@compileError("parsers as .{ Parser(ParsingFunction), ... } must be a struct.");
 
     return Combinators.sequence(blk: {
-            var fnPtrs: [@typeInfo(@TypeOf(parsers)).Struct.fields.len * 2 + 1]ParsingFunction = undefined;
+            var fnPtrs: [@typeInfo(@TypeOf(parsers)).@"struct".fields.len * 2 + 1]ParsingFunction = undefined;
             fnPtrs[0] = Retriever.get(Parsers.separators);
             for (parsers, 0..) |parser, i| {
                 fnPtrs[1 + i * 2] = Retriever.get(parser);
@@ -28,11 +28,11 @@ pub fn sequence(parsers: anytype) type {
 
 /// p1 / ... / pn
 pub fn choice(parsers: anytype) type {
-    if (@typeInfo(@TypeOf(parsers)) != .Struct)
+    if (@typeInfo(@TypeOf(parsers)) != .@"struct")
 		@compileError("parsers as .{ Parser(ParsingFunction), ... } must be a struct.");
 
     return Combinators.choice(blk: {
-            var fnPtrs: [@typeInfo(@TypeOf(parsers)).Struct.fields.len * 2 + 1]ParsingFunction = undefined;
+            var fnPtrs: [@typeInfo(@TypeOf(parsers)).@"struct".fields.len * 2 + 1]ParsingFunction = undefined;
             fnPtrs[0] = Retriever.get(Parsers.separators);
             for (parsers, 0..) |parser, i| {
                 fnPtrs[1 + i * 2] = Retriever.get(parser);
