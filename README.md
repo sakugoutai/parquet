@@ -1,2 +1,2 @@
-# Parquet
-Parser Combinator Library in Zig
+# parquet
+Parser Combinator Library for Zig
