@@ -1,18 +1,15 @@
 const std = @import("std");
 const heap = std.heap;
 const io = std.io;
-const mem = std.mem;
-const Allocator = mem.Allocator;
 
-const Parquet = @import("Parquet.zig");
-const String = Parquet.Base.String;
-const Analyte = Parquet.ParserCombinator.Analyte;
-const Parser = Parquet.ParserCombinator.Parser;
-const Retriever = Parquet.ParserCombinator.Retriever;
-const Combinators = Parquet.ParserCombinator.Combinators;
-const Parsers = Parquet.ParserCombinator.Parsers;
-const Effect = Parquet.ParserCombinator.Effect;
-const Invoker = Parquet.ParserCombinator.Invoker;
+const String = @import("ariadne").String;
+const parquet = @import("parquet");
+const Analyte = parquet.Analyte;
+const Parser = parquet.Parser;
+const Combinators = parquet.Combinators;
+const Parsers = parquet.Parsers;
+const Effect = parquet.Effect;
+const Invoker = parquet.Invoker;
 
 
 pub fn main() anyerror!void {
@@ -21,19 +18,19 @@ pub fn main() anyerror!void {
 
     try Invoker.parseTest(css_rgb_parser, arena.allocator(), try String.init(arena.allocator(), "#aabbcc"));
     var rgb = try RGBBuilder.get();
-    try io.getStdOut().writer().print("R: {s}, G: {s}, B: {s}\n\n", .{ rgb.r.getPrimitive(), rgb.g.getPrimitive(), rgb.b.getPrimitive() });
+    try io.getStdOut().writer().print("R: {s}, G: {s}, B: {s}\n\n", .{ rgb.r.text, rgb.g.text, rgb.b.text });
 
     try Invoker.parseTest(css_rgb_parser, arena.allocator(), try String.init(arena.allocator(), "#abc"));
     rgb = try RGBBuilder.get();
-    try io.getStdOut().writer().print("R: {s}, G: {s}, B: {s}\n\n", .{ rgb.r.getPrimitive(), rgb.g.getPrimitive(), rgb.b.getPrimitive() });
+    try io.getStdOut().writer().print("R: {s}, G: {s}, B: {s}\n\n", .{ rgb.r.text, rgb.g.text, rgb.b.text });
 
     try Invoker.parseTest(css_rgb_parser, arena.allocator(), try String.init(arena.allocator(), "#000000"));
     rgb = try RGBBuilder.get();
-    try io.getStdOut().writer().print("R: {s}, G: {s}, B: {s}\n\n", .{ rgb.r.getPrimitive(), rgb.g.getPrimitive(), rgb.b.getPrimitive() });
+    try io.getStdOut().writer().print("R: {s}, G: {s}, B: {s}\n\n", .{ rgb.r.text, rgb.g.text, rgb.b.text });
 
     try Invoker.parseTest(css_rgb_parser, arena.allocator(), try String.init(arena.allocator(), "#000"));
     rgb = try RGBBuilder.get();
-    try io.getStdOut().writer().print("R: {s}, G: {s}, B: {s}\n\n", .{ rgb.r.getPrimitive(), rgb.g.getPrimitive(), rgb.b.getPrimitive() });
+    try io.getStdOut().writer().print("R: {s}, G: {s}, B: {s}\n\n", .{ rgb.r.text, rgb.g.text, rgb.b.text });
 }
 
 fn css_rgb_parser() type {
@@ -50,7 +47,7 @@ fn css_rrggbb() type {
 
 fn css_rgb() type {
     return Combinators.sequence4(
-        Parsers.match("#"), Effect.attach(r, RGBBuilder.setR), Effect.attach(g, RGBBuilder.setG), Effect.attach(b, RGBBuilder.setB)
+        Parsers.match("#"), r().attach(RGBBuilder.setR), g().attach(RGBBuilder.setG), b().attach(RGBBuilder.setB)
     );
 }
 
@@ -80,12 +77,12 @@ fn b() type {
 
 fn vv() type {
     return Combinators.sequence2(
-        Parsers.hexadecimalDigit, Parsers.hexadecimalDigit
+        Parsers.hexDigit, Parsers.hexDigit
     );
 }
 
 fn v() type {
-    return Parsers.hexadecimalDigit();
+    return Parsers.hexDigit();
 }
 
 const RGB = struct {
@@ -101,22 +98,22 @@ const RGBBuilder = struct {
     var b: String = undefined;
 
     pub fn setR(consumed: String) anyerror!void {
-        RGBBuilder.r = try String.initCopy(consumed);
+        RGBBuilder.r = try consumed.dup();
     }
 
     pub fn setG(consumed: String) anyerror!void {
-        RGBBuilder.g = try String.initCopy(consumed);
+        RGBBuilder.g = try consumed.dup();
     }
 
     pub fn setB(consumed: String) anyerror!void {
-        RGBBuilder.b = try String.initCopy(consumed);
+        RGBBuilder.b = try consumed.dup();
     }
 
     pub fn get() anyerror!RGB {
         return RGB {
-            .r = try String.initCopy(RGBBuilder.r),
-            .g = try String.initCopy(RGBBuilder.g),
-            .b = try String.initCopy(RGBBuilder.b),
+            .r = try RGBBuilder.r.dup(),
+            .g = try RGBBuilder.g.dup(),
+            .b = try RGBBuilder.b.dup(),
         };
     }
 

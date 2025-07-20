@@ -1,17 +1,13 @@
 const std = @import("std");
 const heap = std.heap;
-const io = std.io;
-const mem = std.mem;
-const Allocator = mem.Allocator;
 
-const Parquet = @import("Parquet.zig");
-const String = Parquet.Base.String;
-const Analyte = Parquet.ParserCombinator.Analyte;
-const Parser = Parquet.ParserCombinator.Parser;
-const Retriever = Parquet.ParserCombinator.Retriever;
-const Combinators = Parquet.ParserCombinator.Combinators;
-const Parsers = Parquet.ParserCombinator.Parsers;
-const Invoker = Parquet.ParserCombinator.Invoker;
+const String = @import("ariadne").String;
+const parquet = @import("parquet");
+const Analyte = parquet.Analyte;
+const Parser = parquet.Parser;
+const Combinators = parquet.Combinators;
+const Parsers = parquet.Parsers;
+const Invoker = parquet.Invoker;
 
 
 pub fn main() anyerror!void {
@@ -68,10 +64,10 @@ fn b() type {
 
 fn vv() type {
     return Combinators.sequence2(
-        Parsers.hexadecimalDigit, Parsers.hexadecimalDigit
+        Parsers.hexDigit, Parsers.hexDigit
     );
 }
 
 fn v() type {
-    return Parsers.hexadecimalDigit();
+    return Parsers.hexDigit();
 }
