@@ -1,6 +1,6 @@
 const std = @import("std");
+const fs = std.fs;
 const heap = std.heap;
-const io = std.io;
 
 const String = @import("ariadne").String;
 const parquet = @import("parquet");
@@ -16,21 +16,24 @@ pub fn main() anyerror!void {
     var arena = heap.ArenaAllocator.init(heap.page_allocator);
     defer arena.deinit();
 
+    var stdout = fs.File.stdout().writerStreaming(&.{});
+
+
     try Invoker.parseTest(css_rgb_parser, arena.allocator(), try String.init(arena.allocator(), "#aabbcc"));
     var rgb = try RGBBuilder.get();
-    try io.getStdOut().writer().print("R: {s}, G: {s}, B: {s}\n\n", .{ rgb.r.text, rgb.g.text, rgb.b.text });
+    try stdout.interface.print("R: {s}, G: {s}, B: {s}\n\n", .{ rgb.r.text, rgb.g.text, rgb.b.text });
 
     try Invoker.parseTest(css_rgb_parser, arena.allocator(), try String.init(arena.allocator(), "#abc"));
     rgb = try RGBBuilder.get();
-    try io.getStdOut().writer().print("R: {s}, G: {s}, B: {s}\n\n", .{ rgb.r.text, rgb.g.text, rgb.b.text });
+    try stdout.interface.print("R: {s}, G: {s}, B: {s}\n\n", .{ rgb.r.text, rgb.g.text, rgb.b.text });
 
     try Invoker.parseTest(css_rgb_parser, arena.allocator(), try String.init(arena.allocator(), "#000000"));
     rgb = try RGBBuilder.get();
-    try io.getStdOut().writer().print("R: {s}, G: {s}, B: {s}\n\n", .{ rgb.r.text, rgb.g.text, rgb.b.text });
+    try stdout.interface.print("R: {s}, G: {s}, B: {s}\n\n", .{ rgb.r.text, rgb.g.text, rgb.b.text });
 
     try Invoker.parseTest(css_rgb_parser, arena.allocator(), try String.init(arena.allocator(), "#000"));
     rgb = try RGBBuilder.get();
-    try io.getStdOut().writer().print("R: {s}, G: {s}, B: {s}\n\n", .{ rgb.r.text, rgb.g.text, rgb.b.text });
+    try stdout.interface.print("R: {s}, G: {s}, B: {s}\n\n", .{ rgb.r.text, rgb.g.text, rgb.b.text });
 }
 
 fn css_rgb_parser() type {

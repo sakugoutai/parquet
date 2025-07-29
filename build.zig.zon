@@ -1,14 +1,14 @@
 .{
-    .name = .Parquet,
-    .version = "1.0.0",
+    .name = .parquet,
+    .version = "1.0.1",
 
-    .fingerprint = 0x30581e1ccbd935ee,
-    .minimum_zig_version = "0.15.0-dev.889+b8ac740a1",
+    .fingerprint = 0xffe527805a8350d7,
+    .minimum_zig_version = "0.15.0-dev.1254+c9ce1debe",
 
     .dependencies = .{
         .ariadne = .{
-            .url = "git+https://github.com/sakugoutai/ariadne#bc3e8c9c059d485a917b52c3a8d911ab0dfa8ca3",
-            .hash = "ariadne-1.0.0-YJY0okqhAACvlI3GU0INpjOlyVZH4X7YVdKuB1Ak0D38",
+            .url = "git+https://github.com/sakugoutai/ariadne#6a236e097a76ee3e3bdd36341f162609bbd09097",
+            .hash = "ariadne-1.0.1-87xNpT6hAAAPXlqQ-JMlnQmvCljt_5lX_CAQa28VrK5-",
         },
     },
 

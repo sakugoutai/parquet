@@ -1,5 +1,5 @@
 const std = @import("std");
-const io = std.io;
+const fs = std.fs;
 const mem = std.mem;
 
 const ariadne = @import("ariadne");
@@ -16,22 +16,19 @@ pub fn parse(parser: anytype, allocator: mem.Allocator, text: ariadne.String) an
 }
 
 pub fn parseTest(parser: anytype, allocator: mem.Allocator, text: ariadne.String) anyerror!void {
+    var stdout = fs.File.stdout().writerStreaming(&.{});
+
     const analyte: Analyte = try parse(parser, allocator, text);
     if (analyte.answer == Analyte.Answer.err) {
-        try io.getStdOut().writer().writeAll("Invoker.parserTest: parse failed.\n");
+        try stdout.interface.writeAll("Invoker.parserTest: parse failed.\n");
         return;
     }
 
     if (!analyte.subsequent.empty()) {
-        try io.getStdOut().writer().writeAll("Invoker.parserTest: parse incorrect.\n");
-        try io.getStdOut().writer().print("\"{s}\" [{s}]\n", .{
-            analyte.parsed.text,
-            analyte.subsequent.text
-        });
+        try stdout.interface.writeAll("Invoker.parserTest: parse incorrect.\n");
+        try stdout.interface.print("\"{s}\" [{s}]\n", .{ analyte.parsed.text, analyte.subsequent.text });
         return;
     }
 
-    try io.getStdOut().writer().print("\"{s}\"\n", .{
-        analyte.parsed.text
-    });
+    try stdout.interface.print("\"{s}\"\n", .{ analyte.parsed.text });
 }
