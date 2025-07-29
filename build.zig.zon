@@ -7,8 +7,8 @@
 
     .dependencies = .{
         .ariadne = .{
-            .url = "git+https://github.com/sakugoutai/ariadne#6a236e097a76ee3e3bdd36341f162609bbd09097",
-            .hash = "ariadne-1.0.1-87xNpT6hAAAPXlqQ-JMlnQmvCljt_5lX_CAQa28VrK5-",
+            .url = "git+https://github.com/sakugoutai/ariadne#563cf5591e9e45546b014ce435edc9dc59142c88",
+            .hash = "ariadne-1.0.1-87xNpWihAADkdMBcUeH8OARJf_TLFyZsldLSouuLjx2W",
         },
     },
 
